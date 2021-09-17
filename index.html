@@ -19,13 +19,19 @@
       select {
         margin-bottom: 2em;
       }
+      #piano-wrapper {
+        position: relative;
+        padding: 0;
+        margin: 0;
+      }
       #piano {
+        position: relative;
         padding: 0 !important;
         margin-top: 1em;
       }
       .dot {
+        position: absolute;
         z-index: 1000;
-        position: fixed;
       }
     </style>
 	</head>
@@ -39,7 +45,9 @@
         <select id="modes" onchange="OnSelect()">
           <option value="">-- Select mode --</option>
         </select>
-        <img id="piano" src="piano.png" />
+        <div id="piano-wrapper">
+          <img id="piano" src="piano.png" />
+        </div>
       </div>
     </div>
 
@@ -81,22 +89,20 @@
       }
     }
 
-    function AddDot(pianoPos, noteIdx) {
+    function DrawDot(noteIdx) {
       var img = document.createElement("img");
       img.className = "dot";
-      img.style.left = pianoPos.left + offsets[noteIdx][0] + "px";
-      img.style.top = window.scrollY + pianoPos.top + offsets[noteIdx][1] + "px";
+      img.style.left = offsets[noteIdx][0] + "px";
+      img.style.top = offsets[noteIdx][1] + "px";
       img.src = "dot.png";
-      document.body.appendChild(img);
+      document.getElementById("piano-wrapper").appendChild(img);
     }
 
     function DrawScale(scale) {
       ClearScale();
 
       let pianoPos = document.getElementById("piano").getBoundingClientRect();
-      scale.forEach(function(noteIdx) {
-        AddDot(pianoPos, noteIdx);
-      });
+      scale.forEach(DrawDot);
     }
 
     function OnSelect() {
