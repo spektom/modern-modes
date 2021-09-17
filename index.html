@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Modern Modes for Piano</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="picnic.min.css" />
+    <style type="text/css">
+      body { background-color: black; }
+      img { margin-top: 5em; }
+      #container {
+        max-width: 1044px;
+        margin: auto;
+        padding: 2em 10px;
+      }
+      .flex { 
+        width: 100%;
+        margin: 0;
+      }
+      select {
+        margin-bottom: 2em;
+      }
+      #piano {
+        padding: 0 !important;
+        margin-top: 1em;
+      }
+      .dot {
+        z-index: 1000;
+        position: absolute;
+      }
+    </style>
+	</head>
+
+	<body>
+    <div id="container">
+      <div class="flex one center">
+        <select id="notes" onchange="OnSelect()">
+          <option value="">-- Select note --</option>
+        </select>
+        <select id="modes" onchange="OnSelect()">
+          <option value="">-- Select mode --</option>
+        </select>
+        <img id="piano" src="piano.png" />
+      </div>
+    </div>
+
+  <script>
+    let notesNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'H'];
+
+    let modesNames = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'];
+
+    let modesIntervals = [
+      [2,2,1,2,2,2,1,2],
+      [2,1,2,2,2,1,2,2],
+      [1,2,2,2,1,2,2,1],
+      [2,2,2,1,2,2,1,2],
+      [2,2,1,2,2,1,2,2],
+      [2,1,2,2,1,2,2,2],
+      [1,2,2,1,2,2,2,1]
+    ];
+
+    let offsets = [[15, 250], [29, 100], [78, 250], [118, 100],
+      [153, 250], [226, 250], [250, 100], [299, 250], [334, 100],
+      [375, 250], [420, 100], [450, 250], [522, 250], [553, 100],
+      [595, 250], [639, 100], [671, 250], [744, 250], [772, 100],
+      [820, 250], [859, 100], [895, 250], [946, 100], [967, 250]];
+
+    function BuildScale(noteIdx, modeIdx) {
+      let scale = [];
+      let intervals = modesIntervals[modeIdx];
+      intervals.forEach(function(interval) {
+        scale.push(noteIdx);
+        noteIdx += interval;
+      });
+      return scale;
+    }
+
+    function ClearScale() {
+      let dots = document.getElementsByClassName("dot");
+      while (dots.length > 0) {
+        dots[0].remove();
+      }
+    }
+
+    function AddDot(pianoPos, noteIdx) {
+      var img = document.createElement("img");
+      img.className = "dot";
+      img.style.left = pianoPos.left + offsets[noteIdx][0] + "px";
+      img.style.top = window.scrollY + pianoPos.top + offsets[noteIdx][1] + "px";
+      img.src = "dot.png";
+      document.body.appendChild(img);
+    }
+
+    function DrawScale(scale) {
+      ClearScale();
+
+      let pianoPos = document.getElementById("piano").getBoundingClientRect();
+      scale.forEach(function(noteIdx) {
+        AddDot(pianoPos, noteIdx);
+      });
+    }
+
+    function OnSelect() {
+      let noteIdx = document.getElementById("notes").value;
+      if (noteIdx.length == 0) {
+        return;
+      }
+
+      let modeIdx = document.getElementById("modes").value;
+      if (modeIdx.length == 0) {
+        return;
+      }
+
+      var scale = BuildScale(parseInt(noteIdx), parseInt(modeIdx));
+      DrawScale(scale);
+    }
+
+    function LoadSelectors() {
+      notesNames.forEach(function(note, idx) {
+        document.getElementById("notes").options.add(new Option(note, idx));
+      });
+
+      modesNames.forEach(function(mode, idx) {
+        document.getElementById("modes").options.add(new Option(mode, idx));
+      });
+    }
+
+    LoadSelectors();
+  </script>
+	</body>
+</html>
